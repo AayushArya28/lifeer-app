@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Welcome back</h2>
+      <h2 className="text-2xl font-bold mb-4">Welcome back!</h2>
 
       {/* Exercises Section */}
       <div className="mb-6">
