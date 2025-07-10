@@ -12,12 +12,33 @@ const allDays = [
 ];
 
 export default function Exercise() {
-  const {exerciseData, setExerciseData} = useData();
+  const { exerciseData, setExerciseData } = useData();
 
   const [addState, setAddState] = useState({});
   const [newInputs, setNewInputs] = useState({});
   const [showDayDropdown, setShowDayDropdown] = useState(false);
-  const [confirmDeleteDay, setConfirmDeleteDay] = useState(null); // holds day name to delete
+  const [confirmDeleteDay, setConfirmDeleteDay] = useState(null);
+  const [editing, setEditing] = useState({}); // { day, id, value }
+
+  const handleEdit = (day, id, currentName) => {
+    setEditing({ day, id, value: currentName });
+  };
+
+  const handleEditChange = (value) => {
+    setEditing((prev) => ({ ...prev, value }));
+  };
+
+  const handleEditSave = () => {
+    const { day, id, value } = editing;
+    setExerciseData((prev) => ({
+      ...prev,
+      [day]: prev[day].map((ex) =>
+        ex.id === id ? { ...ex, name: value } : ex
+      ),
+    }));
+    setEditing({});
+  };
+
 
   const handleAddDay = (day) => {
     if (!exerciseData[day]) {
@@ -106,33 +127,42 @@ export default function Exercise() {
             </div>
 
             {exerciseData[day].map((ex) => (
-              <div
-                key={ex.id}
-                className="flex items-center justify-between mb-2"
-              >
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={ex.completed}
-                    onChange={() => toggleComplete(day, ex.id)}
-                    className="accent-blue-500"
-                  />
-                  <span
-                    className={`${
-                      ex.completed ? "line-through text-gray-500" : ""
-                    }`}
-                  >
-                    {ex.name}
-                  </span>
-                </div>
-                <button
-                  onClick={() => deleteExercise(day, ex.id)}
-                  className="text-red-500 hover:underline text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
+  <div key={ex.id} className="flex items-center justify-between mb-2">
+    <div className="flex items-center gap-2 w-full">
+      <input
+        type="checkbox"
+        checked={ex.completed}
+        onChange={() => toggleComplete(day, ex.id)}
+        className="accent-blue-500"
+      />
+      {editing.id === ex.id && editing.day === day ? (
+        <input
+          value={editing.value}
+          onChange={(e) => handleEditChange(e.target.value)}
+          className="flex-1 border rounded px-2 py-1 text-sm"
+        />
+      ) : (
+        <span className={`flex-1 ${ex.completed ? "line-through text-gray-500" : ""}`}>
+          {ex.name}
+        </span>
+      )}
+    </div>
+    <div className="flex items-center gap-2 text-sm">
+      {editing.id === ex.id && editing.day === day ? (
+        <>
+          <button onClick={handleEditSave}>💾</button>
+          <button onClick={() => setEditing({})}>❌</button>
+        </>
+      ) : (
+        <>
+          <button onClick={() => handleEdit(day, ex.id, ex.name)}>✏️</button>
+          <button onClick={() => deleteExercise(day, ex.id)}>🗑️</button>
+        </>
+      )}
+    </div>
+  </div>
+))}
+
 
             {addState[day] ? (
               <div className="mt-4 flex flex-col gap-2">
@@ -168,11 +198,10 @@ export default function Exercise() {
                   <button
                     disabled={!isValidInput(newInputs[day])}
                     onClick={() => handleSaveExercise(day)}
-                    className={`text-sm px-4 py-1 rounded text-white ${
-                      isValidInput(newInputs[day])
+                    className={`text-sm px-4 py-1 rounded text-white ${isValidInput(newInputs[day])
                         ? "bg-blue-500 hover:bg-blue-600"
                         : "bg-gray-300 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     Save
                   </button>
