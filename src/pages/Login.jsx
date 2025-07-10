@@ -17,9 +17,9 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [name, setName] = useState(""); // optional
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
 
     // 🔽 2. Firebase handler
     const handleSubmit = async () => {
@@ -41,15 +41,16 @@ export default function Login() {
         try {
             if (signIn) {
                 await signInWithEmailAndPassword(auth, email, password);
-                console.log("✅ Logged in!");
+                setError(""); // clear error
+                setSuccess("Login successful!");
+                setTimeout(() => {
+                    navigate("/dashboard");
+                }, 1000);
             } else {
                 await createUserWithEmailAndPassword(auth, email, password);
-                console.log("✅ Signed up!");
+                setError(""); // clear error
+                setSuccess("Account created successfully! You can now login.");
             }
-
-            // ✅ Redirect after success
-            navigate("/dashboard");
-
         } catch (error) {
             console.error("🔥 Firebase error:", error);
 
@@ -57,15 +58,17 @@ export default function Login() {
                 setError("Invalid email format.");
             } else if (error.code === "auth/email-already-in-use") {
                 setError("Email already in use. Try logging in.");
-            } else if (error.code === "auth/missing-password") {
-                setError("Please enter a password.");
+            } else if (error.code === "auth/user-not-found") {
+                setError("No account found with this email.");
+            } else if (error.code === "auth/wrong-password") {
+                setError("Incorrect password.");
             } else {
                 setError("Authentication failed. Try again.");
             }
         } finally {
             setLoading(false);
-        };
-    }
+        }
+    };
 
 
     return (
@@ -77,6 +80,7 @@ export default function Login() {
                         }`}
                 >
                     <form className="bg-white flex items-center justify-center flex-col px-[50px] h-full text-center">
+
                         <h1 className="font-bold m-0 text-xl">Create Account</h1>
                         <input
                             type="text"
@@ -108,6 +112,7 @@ export default function Login() {
                                 {showPassword ? "Show" : <s>Show</s>}
                             </button>
                         </div>
+
                         <button
                             type="button"
                             onClick={handleSubmit}
@@ -116,6 +121,16 @@ export default function Login() {
                         >
                             {loading ? "Please wait..." : "Sign Up"}
                         </button>
+                        {error && (
+                            <p className="text-red-600 text-sm bg-red-100 px-3 py-2 rounded w-full my-2">
+                                {error}
+                            </p>
+                        )}
+                        {success && (
+                            <p className="text-green-600 text-sm bg-green-100 px-3 py-2 rounded w-full my-2">
+                                {success}
+                            </p>
+                        )}
                     </form>
                 </div>
 
@@ -125,6 +140,7 @@ export default function Login() {
                         }`}
                 >
                     <form className="bg-white flex items-center justify-center flex-col px-[50px] h-full text-center">
+
                         <h1 className="font-bold m-0 text-xl">Sign in</h1>
                         <input
                             type="email"
@@ -163,6 +179,16 @@ export default function Login() {
                         >
                             {loading ? "Please wait..." : "Sign In"}
                         </button>
+                        {error && (
+                            <p className="text-red-600 text-sm bg-red-100 px-3 py-2 rounded w-full my-2">
+                                {error}
+                            </p>
+                        )}
+                        {success && (
+                            <p className="text-green-600 text-sm bg-green-100 px-3 py-2 rounded w-full my-2">
+                                {success}
+                            </p>
+                        )}
                     </form>
                 </div>
 
