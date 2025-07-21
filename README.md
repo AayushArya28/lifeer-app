@@ -5,7 +5,7 @@ A full-stack personal productivity web app to manage **workouts**, **meals**, **
 
 ---
 
-## Site is Live - https://lifeer-app.vercel.app/
+## [Site is Live](https://lifeer-app.vercel.app/)
 
 ## 🚀 Features
 
